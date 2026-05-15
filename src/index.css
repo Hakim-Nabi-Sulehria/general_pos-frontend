@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- 1. COLORS & VARIABLES (Existing Code) --- */
+@layer base {
+  :root {
+    --background: 220 17% 97%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217 91% 60%;
+    --radius: 0.5rem;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 28% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 28% 17%;
+    --sidebar-ring: 217 91% 60%;
+    --chart-1: 217 91% 60%;
+    --chart-2: 142 76% 36%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 82% 52%;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --border: 215 28% 17%;
+    --input: 215 28% 17%;
+    --ring: 217 91% 60%;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 28% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 28% 17%;
+    --sidebar-ring: 217 91% 60%;
+    --chart-1: 217 91% 60%;
+    --chart-2: 142 76% 36%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 82% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* --- 2. GLOBAL TYPOGRAPHY (Generic Styles) --- */
+  
+  /* H1: Main Page Titles */
+  h1 {
+    @apply scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl;
+  }
+
+  /* H2: Section Headers */
+  h2 {
+    @apply scroll-m-20 pb-2 text-2xl font-semibold tracking-tight first:mt-0;
+  }
+
+  /* H3: Card/Sub-section Titles */
+  h3 {
+    @apply scroll-m-20 text-xl font-semibold tracking-tight;
+  }
+
+  /* H4: Small Titles */
+  h4 {
+    @apply scroll-m-20 text-lg font-semibold tracking-tight;
+  }
+
+  /* P: Standard Body Text */
+  p {
+    @apply leading-7 text-muted-foreground [&:not(:first-child)]:mt-6;
+  }
+
+  /* Blockquote */
+  blockquote {
+    @apply mt-6 border-l-2 pl-6 italic text-muted-foreground;
+  }
+}
+
+/* --- 3. GLOBAL UTILITY CLASSES (Generic Layouts) --- */
+@layer components {
+  
+  /* Har Page ka Main Wrapper */
+  .page-container {
+    @apply flex-1 space-y-4 p-4 md:p-8 pt-6 w-full max-w-7xl mx-auto;
+  }
+
+  /* Har Page ka Top Section (Title + Button) */
+  .page-header {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6;
+  }
+
+  /* Title ke neechay wali choti description line */
+  .page-description {
+    @apply text-sm text-muted-foreground mt-1;
+  }
+  
+  /* Cards ka Grid Layout (Auto responsive) */
+  .page-grid {
+    @apply grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+
+  /* --- GLOBAL COMPACT CARD DESIGN --- */
+  
+  /* Container: Borders aur Shadow handle karega */
+  .card-compact {
+    @apply h-full flex flex-col border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all rounded-lg;
+  }
+
+  /* Header: Padding bohat kam (Small) */
+  .card-compact-header {
+    @apply flex flex-row items-center justify-between p-3 pb-0 space-y-0;
+  }
+
+  /* Content: Text chota (xs) aur spacing tight */
+  .card-compact-content {
+    @apply flex-1 p-3 pt-2 text-xs text-muted-foreground space-y-2;
+  }
+
+  /* Footer: Badges wagera ke liye */
+  .card-compact-footer {
+    @apply flex items-center p-3 pt-0 gap-2 flex-wrap;
+  }
+
+  /* Title Text: Bold aur Small */
+  .text-compact-title {
+    @apply text-sm font-semibold leading-none tracking-tight truncate;
+  }
+
+  /* Icons: Standard Small Size */
+  .icon-compact {
+    @apply h-3.5 w-3.5 shrink-0 text-muted-foreground;
+  }
+}
