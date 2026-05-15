@@ -37,6 +37,7 @@ import {
 
 import { productApi } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { asArray } from "@/lib/utils";
 
 const columnHelper = createColumnHelper<any>();
 
@@ -50,7 +51,10 @@ export default function Products() {
   // --- 1. DATA FETCHING ---
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
-    queryFn: () => productApi.getAll().then((res) => res.data || res),
+    queryFn: async () => {
+      const res = await productApi.getAll();
+      return asArray(res.data ?? res);
+    },
   });
 
   // --- 2. DELETE MUTATION ---

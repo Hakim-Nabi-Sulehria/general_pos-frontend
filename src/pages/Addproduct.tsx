@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -39,7 +40,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { productApi, branchApi, categoryApi } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { cn, asArray } from "@/lib/utils";
 
 // --- TYPES & INTERFACES ---
 interface Branch {
@@ -91,21 +92,19 @@ export default function AddProduct() {
     queryKey: ["branches"],
     queryFn: async () => {
       const res = await branchApi.getAll();
-      const d = res.data;
-      return Array.isArray(d) ? d : [];
+      return asArray<Branch>(res.data ?? res);
     },
   });
-  const branchesData: Branch[] = branchesRaw ?? [];
+  const branchesData = asArray<Branch>(branchesRaw);
 
   const { data: categoriesRaw } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const res = await categoryApi.getAll();
-      const d = res.data;
-      return Array.isArray(d) ? d : [];
+      return asArray<Category>(res.data ?? res);
     },
   });
-  const categoriesData: Category[] = categoriesRaw ?? [];
+  const categoriesData = asArray<Category>(categoriesRaw);
 
   // --- DERIVED DATA ---
   const rootCategories = categoriesData?.filter((c) => !c.parentId) || [];
@@ -127,6 +126,7 @@ export default function AddProduct() {
     formState: { errors },
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
+    shouldUnregister: false,
     defaultValues: {
       unit: "pcs",
       branchIds: [],
@@ -358,22 +358,18 @@ export default function AddProduct() {
                 </CardContent>
               </Card>
 
-              {/* CARD 3: Attributes (Toggle) */}
+              {/* CARD 3: Attributes (toggle with Switch — avoids click conflicts with Checkbox) */}
               <Card className="border-slate-200 shadow-sm overflow-hidden">
-                <div
-                  className="bg-slate-50/50 px-6 py-3 border-b border-slate-100 flex items-center justify-between cursor-pointer hover:bg-slate-100 transition-colors"
-                  onClick={() => setShowAttributes(!showAttributes)}
-                >
-                  <div className="flex items-center gap-2">
-                    <Settings2 className="h-4 w-4 text-slate-500" />
+                <div className="bg-slate-50/50 px-6 py-3 border-b border-slate-100 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Settings2 className="h-4 w-4 text-slate-500 shrink-0" />
                     <span className="text-sm font-semibold text-slate-700">
                       Product Attributes
                     </span>
                   </div>
-                  <Checkbox
+                  <Switch
                     checked={showAttributes}
-                    onCheckedChange={(c) => setShowAttributes(!!c)}
-                    onClick={(e) => e.stopPropagation()} // Prevent double toggle
+                    onCheckedChange={(v) => setShowAttributes(!!v)}
                   />
                 </div>
 

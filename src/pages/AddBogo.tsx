@@ -76,7 +76,7 @@ export default function AddBogo() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["discounts"] });
       toast({ title: "BOGO Offer Live! 🎁" });
-      navigate("/discounts");
+      navigate("/discount");
     },
     onError: () =>
       toast({ title: "Error creating offer", variant: "destructive" }),

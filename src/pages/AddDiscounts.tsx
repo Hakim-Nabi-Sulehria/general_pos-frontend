@@ -40,7 +40,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { discountApi, productApi, categoryApi } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { cn, asArray } from "@/lib/utils";
 
 // --- TYPES & INTERFACES ---
 interface Product {
@@ -96,7 +96,7 @@ export default function AddDiscount() {
     queryKey: ["products"],
     queryFn: async () => {
       const res = await productApi.getAll();
-      return res.data as Product[];
+      return asArray(res.data ?? res);
     },
   });
 
@@ -104,7 +104,7 @@ export default function AddDiscount() {
     queryKey: ["categories"],
     queryFn: async () => {
       const res = await categoryApi.getAll();
-      return res.data as Category[];
+      return asArray(res.data ?? res);
     },
   });
 
@@ -180,11 +180,13 @@ export default function AddDiscount() {
 
   // --- FILTER TARGETS ---
   const targetList = useMemo(() => {
-    const list = scope === "product" ? productsData : (categoriesData as any[]); // generic handling due to different shapes
-    if (!list) return [];
-
+    const list = asArray<Product | Category>(
+      scope === "product" ? productsData : categoriesData
+    );
     return list.filter((item) =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      (item as { name?: string }).name
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase())
     );
   }, [scope, productsData, categoriesData, searchQuery]);
 
@@ -207,7 +209,7 @@ export default function AddDiscount() {
       toast({
         title: isEditMode ? "Discount updated!" : "Discount created!",
       });
-      navigate("/discounts");
+      navigate("/discount");
     },
     onError: (error: any) => {
       toast({
@@ -244,7 +246,7 @@ export default function AddDiscount() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/discounts")}
+            onClick={() => navigate("/discount")}
             className="rounded-full hover:bg-slate-100"
           >
             <ArrowLeft className="h-5 w-5 text-slate-600" />
@@ -265,7 +267,7 @@ export default function AddDiscount() {
           <Button
             variant="outline"
             className="hidden sm:flex"
-            onClick={() => navigate("/discounts")}
+            onClick={() => navigate("/discount")}
           >
             Cancel
           </Button>

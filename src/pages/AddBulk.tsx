@@ -97,7 +97,7 @@ export default function AddBulk() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["discounts"] });
       toast({ title: "Bulk Deal Activated! 🚀" });
-      navigate("/discounts");
+      navigate("/discount");
     },
     onError: (error: any) => {
       console.error("API Error Details:", error);

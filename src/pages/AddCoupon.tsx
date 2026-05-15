@@ -87,7 +87,7 @@ export default function AddCoupon() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["discounts"] });
       toast({ title: "Coupon Created Successfully" });
-      navigate("/discounts");
+      navigate("/discount");
     },
     onError: (error: any) => {
       console.error(error); // Debugging ke liye
@@ -118,7 +118,7 @@ export default function AddCoupon() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/discounts")}>
+          <Button variant="outline" onClick={() => navigate("/discount")}>
             Cancel
           </Button>
           <Button

@@ -47,7 +47,7 @@ import {
   DialogHeader,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn, asArray } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 
 // --- 1. RECEIPT TEMPLATE (Includes Coupon/Discount details) ---
@@ -209,19 +209,31 @@ export default function POS() {
   // --- QUERIES ---
   const { data: orgs } = useQuery({
     queryKey: ["organizations"],
-    queryFn: organizationApi.getAll,
+    queryFn: async () => {
+      const res = await organizationApi.getAll();
+      return asArray(res.data ?? res);
+    },
   });
   const { data: branches } = useQuery({
     queryKey: ["branches"],
-    queryFn: branchApi.getAll,
+    queryFn: async () => {
+      const res = await branchApi.getAll();
+      return asArray(res.data ?? res);
+    },
   });
   const { data: products } = useQuery({
     queryKey: ["products"],
-    queryFn: productApi.getAll,
+    queryFn: async () => {
+      const res = await productApi.getAll();
+      return asArray(res.data ?? res);
+    },
   });
   const { data: activeDiscounts } = useQuery({
     queryKey: ["activeDiscounts"],
-    queryFn: discountApi.getActive,
+    queryFn: async () => {
+      const res = await discountApi.getActive();
+      return asArray(res.data ?? res);
+    },
   });
 
   // Get Drawer Balance
@@ -235,9 +247,10 @@ export default function POS() {
   // --- FILTER & CALCULATIONS ---
   const filteredProducts = useMemo(() => {
     if (!selectedBranch) return [];
-    return (products?.data || []).filter((p: any) => {
+    const list = asArray<Record<string, unknown>>(products);
+    return list.filter((p: any) => {
       const isLinkedToBranch = p.branchId === selectedBranch;
-      const matchesSearch = p.name
+      const matchesSearch = (p.name ?? "")
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
       return isLinkedToBranch && matchesSearch && p.stockQuantity > 0;
@@ -255,8 +268,8 @@ export default function POS() {
 
       // Auto Discount Logic
       let itemDiscount = 0;
-      if (applyDiscount && activeDiscounts?.data) {
-        const applicable = activeDiscounts.data.find(
+      if (applyDiscount && activeDiscounts?.length) {
+        const applicable = activeDiscounts.find(
           (d: any) =>
             d.scope === "GLOBAL" ||
             d.products?.some((p: any) => p.id === item.id)
@@ -488,7 +501,7 @@ export default function POS() {
                 <SelectValue placeholder="Org" />
               </SelectTrigger>
               <SelectContent>
-                {orgs?.data?.map((o: any) => (
+                {(orgs ?? []).map((o: any) => (
                   <SelectItem key={o.id} value={o.id}>
                     {o.name}
                   </SelectItem>
@@ -504,7 +517,12 @@ export default function POS() {
                 <SelectValue placeholder="Branch" />
               </SelectTrigger>
               <SelectContent>
-                {branches?.data?.map((b: any) => (
+                {(branches ?? [])
+                  .filter(
+                    (b: any) =>
+                      !selectedOrg || b.organizationId === selectedOrg
+                  )
+                  .map((b: any) => (
                   <SelectItem key={b.id} value={b.id}>
                     {b.name}
                   </SelectItem>

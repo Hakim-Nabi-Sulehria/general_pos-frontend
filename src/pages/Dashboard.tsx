@@ -51,6 +51,7 @@ import {
 import { KpiCard } from "@/components/KpiCard";
 
 import { dashboardApi, branchApi } from "@/lib/api";
+import { asArray } from "@/lib/utils";
 import {
   AreaChart,
   Area,
@@ -83,12 +84,16 @@ export default function Dashboard() {
 
   const { data: branches } = useQuery({
     queryKey: ["branches"],
-    queryFn: branchApi.getAll,
+    queryFn: async () => {
+      const res = await branchApi.getAll();
+      return asArray(res.data ?? res);
+    },
   });
 
   const cities = useMemo(() => {
-    if (!branches?.data) return [];
-    const allCities = branches.data.map((b: any) => {
+    const list = asArray<Record<string, unknown>>(branches);
+    if (!list.length) return [];
+    const allCities = list.map((b: any) => {
       if (!b.address) return "Unknown";
       const parts = b.address.split(",");
       return parts.length > 1 ? parts[parts.length - 1].trim() : b.address;
@@ -101,10 +106,16 @@ export default function Dashboard() {
   const {
     cards = {},
     salesTrend = [],
-    mapData = [],
+    mapData: mapDataRaw = [],
     topProducts = [],
     recentSales = [],
   } = stats?.data || {};
+
+  const mapData = useMemo(() => asArray(mapDataRaw), [mapDataRaw]);
+
+  const salesTrendList = useMemo(() => asArray(salesTrend), [salesTrend]);
+  const recentSalesList = useMemo(() => asArray(recentSales), [recentSales]);
+  const topProductsList = useMemo(() => asArray(topProducts), [topProducts]);
 
   const filteredMapData = useMemo(() => {
     if (selectedCity === "ALL") return mapData;
@@ -179,8 +190,8 @@ export default function Dashboard() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All Branches</SelectItem>
-              {branches?.data
-                ?.filter(
+              {(asArray(branches) as any[])
+                .filter(
                   (b: any) =>
                     selectedCity === "ALL" ||
                     b.address
@@ -240,7 +251,7 @@ export default function Dashboard() {
           <CardContent className="pl-0">
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={salesTrend}>
+                <AreaChart data={salesTrendList}>
                   <defs>
                     <linearGradient
                       id="colorGradient"
@@ -297,7 +308,7 @@ export default function Dashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentSales.slice(0, 5).map((sale: any) => (
+                {recentSalesList.slice(0, 5).map((sale: any) => (
                   <TableRow
                     key={sale.id}
                     className="cursor-pointer"
@@ -358,7 +369,7 @@ export default function Dashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={topProducts}
+                    data={topProductsList}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -366,7 +377,7 @@ export default function Dashboard() {
                     paddingAngle={5}
                     dataKey="revenue"
                   >
-                    {topProducts?.map((_: any, index: number) => (
+                    {topProductsList.map((_: any, index: number) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={CHART_COLORS[index % CHART_COLORS.length]}

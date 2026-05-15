@@ -43,6 +43,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { inventoryApi, productApi } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { asArray } from "@/lib/utils";
 
 // --- HELPERS ---
 const historyColumnHelper = createColumnHelper<any>();
@@ -70,7 +71,10 @@ export default function Inventory() {
     refetch: refetchHistory,
   } = useQuery({
     queryKey: ["inventory"],
-    queryFn: () => inventoryApi.getAll(),
+    queryFn: async () => {
+      const res = await inventoryApi.getAll();
+      return asArray(res.data ?? res);
+    },
   });
 
   const {
@@ -79,7 +83,10 @@ export default function Inventory() {
     refetch: refetchStock,
   } = useQuery({
     queryKey: ["products"],
-    queryFn: () => productApi.getAll(),
+    queryFn: async () => {
+      const res = await productApi.getAll();
+      return asArray(res.data ?? res);
+    },
   });
 
   const handleRefresh = () => {
@@ -110,7 +117,7 @@ export default function Inventory() {
       toast({ title: "Invalid input", variant: "destructive" });
       return;
     }
-    const selectedProduct = productsData?.data?.find(
+    const selectedProduct = (productsData ?? []).find(
       (p: any) => p.id === adjustProductId
     );
     if (!selectedProduct) return;
@@ -276,7 +283,7 @@ export default function Inventory() {
 
   // --- TABLES ---
   const stockTable = useReactTable({
-    data: productsData?.data || [],
+    data: productsData ?? [],
     columns: stockColumns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -288,9 +295,9 @@ export default function Inventory() {
 
   const historyTable = useReactTable({
     data:
-      inventoryData?.data?.filter(
+      (inventoryData ?? []).filter(
         (item: any) => typeFilter === "ALL" || item.type === typeFilter
-      ) || [],
+      ),
     columns: historyColumns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -336,7 +343,7 @@ export default function Inventory() {
                       <SelectValue placeholder="Select Product" />
                     </SelectTrigger>
                     <SelectContent>
-                      {productsData?.data?.map((p: any) => (
+                      {(productsData ?? []).map((p: any) => (
                         <SelectItem key={p.id} value={p.id}>
                           {p.name} (Qty: {p.stockQuantity})
                         </SelectItem>
@@ -397,21 +404,20 @@ export default function Inventory() {
         {[
           {
             label: "Total Products",
-            val: productsData?.data?.length || 0,
+            val: (productsData ?? []).length,
             icon: Package,
             color: "text-primary",
           },
           {
             label: "Low Stock",
-            val:
-              productsData?.data?.filter((p: any) => p.stockQuantity < 10)
-                .length || 0,
+            val: (productsData ?? []).filter((p: any) => p.stockQuantity < 10)
+              .length,
             icon: ArrowRightLeft,
             color: "text-destructive",
           },
           {
             label: "Movements",
-            val: inventoryData?.data?.length || 0,
+            val: (inventoryData ?? []).length,
             icon: History,
             color: "text-blue-600",
           },
