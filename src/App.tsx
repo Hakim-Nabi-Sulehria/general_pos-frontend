@@ -7,6 +7,7 @@ import { DashboardLayout } from "./components/layout/DashboardLayout";
 
 // --- PAGES ---
 import Login from "./pages/Login";
+import SetupSuperadmin from "./pages/SetupSuperadmin";
 import Dashboard from "./pages/Dashboard";
 import Organizations from "./pages/Organizations";
 import Branches from "./pages/Branches";
@@ -62,6 +63,7 @@ const App = () => (
         <Routes>
           {/* 1. PUBLIC ROUTE (Login) */}
           <Route path="/login" element={<Login />} />
+          <Route path="/setup" element={<SetupSuperadmin />} />
 
           {/* 2. PROTECTED ROUTES (Requires Login) */}
           <Route

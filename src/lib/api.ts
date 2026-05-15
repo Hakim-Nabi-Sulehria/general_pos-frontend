@@ -41,7 +41,16 @@ export const authApi = {
   register: (data: any) => api.post('/auth/register', data),
   getProfile: () => api.get('/auth/profile'),
   getAllUsers: () => api.get('/auth/users'), // <-- NEW for Staff Page
-};export const organizationApi = {
+  bootstrapStatus: () => api.get<{ data: { superadminExists: boolean } }>('/auth/bootstrap/status'),
+  bootstrapSuperadmin: (data: Record<string, unknown>, bootstrapSecret?: string) =>
+    api.post('/auth/bootstrap/superadmin', data, {
+      headers: bootstrapSecret
+        ? { 'x-auth-bootstrap-secret': bootstrapSecret }
+        : undefined,
+    }),
+};
+
+export const organizationApi = {
   getAll: () => api.get("/organizations"),
   create: (data: any) => api.post("/organizations", data),
   update: (id: string, data: any) => api.put(`/organizations/${id}`, data),

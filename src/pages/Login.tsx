@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Navigation ke liye
+import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { LogIn, Loader2, Store, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -131,6 +131,16 @@ export default function Login() {
               <ShieldCheck className="h-3 w-3 text-green-600" />
               <span>Secured with Enterprise RBAC</span>
             </div>
+
+            <p className="text-center text-xs text-muted-foreground">
+              First install?{" "}
+              <Link
+                to="/setup"
+                className="text-primary font-medium hover:underline"
+              >
+                Create super admin (one-time)
+              </Link>
+            </p>
           </CardFooter>
         </form>
       </Card>
