@@ -12,10 +12,11 @@ dist
 dist-ssr
 *.local
 
-# Env (keep .env.example)
+# Env (keep .env.example; .env.production = public API URL for production builds)
 .env
 .env.*
 !.env.example
+!.env.production
 
 # Editor directories and files
 .vscode/*
