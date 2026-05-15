@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Outlet } from "react-router-dom";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -31,7 +31,7 @@ function SidebarLogic() {
 }
 
 interface DashboardLayoutProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
@@ -80,7 +80,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* --- CONTENT --- */}
         <main className="flex-1 overflow-auto p-4 md:p-6 bg-muted/10">
-          <div className="mx-auto max-w-7xl w-full">{children}</div>
+          <div className="mx-auto max-w-7xl w-full">
+            {children ?? <Outlet />}
+          </div>
         </main>
       </div>
 

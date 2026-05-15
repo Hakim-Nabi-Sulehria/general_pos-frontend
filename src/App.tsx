@@ -2,7 +2,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 
 // --- PAGES ---
@@ -39,20 +45,23 @@ import AddBogo from "./pages/AddBogo";
 import AddBulk from "./pages/AddBulk";
 import CashRequests from "./pages/CashRequest";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-// --- AUTH GUARD (Darbaan) ---
-const RequireAuth = ({ children }: { children: React.ReactNode }) => {
+/** JWT check — use `<Outlet />` so nested layout routes match reliably (fixes blank page on client nav). */
+function RequireAuth() {
   const token = localStorage.getItem("token");
-
-  // Agar Token nahi hai -> Login par jao
   if (!token) {
     return <Navigate to="/login" replace />;
   }
-
-  // Agar Token hai -> Ander aane do
-  return <>{children}</>;
-};
+  return <Outlet />;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -61,86 +70,50 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* 1. PUBLIC ROUTE (Login) */}
           <Route path="/login" element={<Login />} />
           <Route path="/setup" element={<SetupSuperadmin />} />
 
-          {/* 2. PROTECTED ROUTES (Requires Login) */}
-          <Route
-            path="/*"
-            element={
-              <RequireAuth>
-                <DashboardLayout>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    {/* Management Pages */}
-                    <Route path="/organizations" element={<Organizations />} />
-                    <Route
-                      path="/organizations/new"
-                      element={<AddOrganization />}
-                    />
-                    <Route
-                      path="/organizations/edit/:id"
-                      element={<AddOrganization />}
-                    />
-                    <Route path="/branches" element={<Branches />} />
-                    <Route path="/branches/new" element={<AddBranch />} />
-                    <Route path="/branches/edit/:id" element={<AddBranch />} />
-                    <Route path="/users" element={<Users />} />
-                    <Route path="/users/new" element={<AddUser />} />
-                    {/* Staff Page */}
-                    <Route path="/account" element={<Accounts />} />
-                    {/* Inventory Pages */}
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/products/new" element={<AddProduct />} />
-                    <Route path="/categories" element={<Categories />} />
-                    <Route path="/categories/new" element={<AddCategory />} />
-                    <Route
-                      path="/categories/edit/:id"
-                      element={<AddCategory />}
-                    />
-                    <Route path="/suppliers" element={<Suppliers />} />
-                    <Route path="/suppliers/new" element={<AddSupplier />} />
-                    <Route
-                      path="/suppliers/edit/:id"
-                      element={<AddSupplier />}
-                    />
-                    <Route path="/purchases" element={<Purchases />} />
-                    <Route path="/purchases/new" element={<CreatePurchase />} />
-                    <Route path="/transfers" element={<Transfers />} />
-                    <Route path="/transfers/new" element={<AddTransfer />} />
-                    <Route path="/inventory" element={<Inventory />} />
-                    {/* Sales Pages */}
-                    <Route path="/discount" element={<Discounts />} />
-                    <Route path="/discounts/new" element={<AddDiscount />} />
-                    <Route
-                      path="/discounts/create-coupon"
-                      element={<AddCoupon />}
-                    />
-                    <Route
-                      path="/discounts/create-bogo"
-                      element={<AddBogo />}
-                    />
-                    <Route
-                      path="/discounts/create-bulk"
-                      element={<AddBulk />}
-                    />
-
-                    <Route
-                      path="/discounts/edit/:id"
-                      element={<AddDiscount />}
-                    />
-                    <Route path="/pos" element={<POS />} />
-                    <Route path="/cashrequest" element={<CashRequests />} />
-                    <Route path="/sales" element={<Sales />} />
-                    <Route path="/returns" element={<Returns />} />
-                    {/* 404 Page */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </DashboardLayout>
-              </RequireAuth>
-            }
-          />
+          <Route element={<RequireAuth />}>
+            <Route element={<DashboardLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="organizations" element={<Organizations />} />
+              <Route path="organizations/new" element={<AddOrganization />} />
+              <Route
+                path="organizations/edit/:id"
+                element={<AddOrganization />}
+              />
+              <Route path="branches" element={<Branches />} />
+              <Route path="branches/new" element={<AddBranch />} />
+              <Route path="branches/edit/:id" element={<AddBranch />} />
+              <Route path="users" element={<Users />} />
+              <Route path="users/new" element={<AddUser />} />
+              <Route path="account" element={<Accounts />} />
+              <Route path="products" element={<Products />} />
+              <Route path="products/new" element={<AddProduct />} />
+              <Route path="categories" element={<Categories />} />
+              <Route path="categories/new" element={<AddCategory />} />
+              <Route path="categories/edit/:id" element={<AddCategory />} />
+              <Route path="suppliers" element={<Suppliers />} />
+              <Route path="suppliers/new" element={<AddSupplier />} />
+              <Route path="suppliers/edit/:id" element={<AddSupplier />} />
+              <Route path="purchases" element={<Purchases />} />
+              <Route path="purchases/new" element={<CreatePurchase />} />
+              <Route path="transfers" element={<Transfers />} />
+              <Route path="transfers/new" element={<AddTransfer />} />
+              <Route path="inventory" element={<Inventory />} />
+              <Route path="discount" element={<Discounts />} />
+              <Route path="discounts/new" element={<AddDiscount />} />
+              <Route path="discounts/create-coupon" element={<AddCoupon />} />
+              <Route path="discounts/create-bogo" element={<AddBogo />} />
+              <Route path="discounts/create-bulk" element={<AddBulk />} />
+              <Route path="discounts/edit/:id" element={<AddDiscount />} />
+              <Route path="pos" element={<POS />} />
+              <Route path="cashrequest" element={<CashRequests />} />
+              <Route path="sales" element={<Sales />} />
+              <Route path="returns" element={<Returns />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Route>
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

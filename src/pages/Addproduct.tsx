@@ -87,21 +87,25 @@ export default function AddProduct() {
   const [branchSearch, setBranchSearch] = useState("");
 
   // --- API QUERIES ---
-  const { data: branchesData } = useQuery({
+  const { data: branchesRaw } = useQuery({
     queryKey: ["branches"],
     queryFn: async () => {
       const res = await branchApi.getAll();
-      return res.data as Branch[];
+      const d = res.data;
+      return Array.isArray(d) ? d : [];
     },
   });
+  const branchesData: Branch[] = branchesRaw ?? [];
 
-  const { data: categoriesData } = useQuery({
+  const { data: categoriesRaw } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const res = await categoryApi.getAll();
-      return res.data as Category[];
+      const d = res.data;
+      return Array.isArray(d) ? d : [];
     },
   });
+  const categoriesData: Category[] = categoriesRaw ?? [];
 
   // --- DERIVED DATA ---
   const rootCategories = categoriesData?.filter((c) => !c.parentId) || [];
@@ -110,8 +114,8 @@ export default function AddProduct() {
     categoriesData?.filter((c) => c.parentId === selectedRootCategory) || [];
 
   // Filter Branches based on search
-  const filteredBranches = branchesData?.filter((b) =>
-    b.name.toLowerCase().includes(branchSearch.toLowerCase())
+  const filteredBranches = branchesData.filter((b) =>
+    (b.name ?? "").toLowerCase().includes(branchSearch.toLowerCase())
   );
 
   // --- FORM SETUP ---
